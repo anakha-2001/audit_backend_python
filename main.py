@@ -113,6 +113,14 @@ async def get_audit_by_id(audit_id: int):
         if not row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Audit not found")
         return dict(row)
+        audit_details = dict(row)
+
+        # The 'report_data' from the DB is a JSON string; parse it back into a list
+        if audit_details.get('report_data') and isinstance(audit_details['report_data'], str):
+            audit_details['report_data'] = json.loads(audit_details['report_data'])
+        
+        # Return the corrected dictionary
+        return audit_details
     except Exception as e:
         print(f"Error fetching audit {audit_id}: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
